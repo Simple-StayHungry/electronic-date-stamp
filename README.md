@@ -10,6 +10,14 @@ A PDF date-stamping tool focused on safe placement, layout preservation and post
 
 <p align="center"><img src="docs/ui-overview.svg" width="100%" alt="Interface overview"></p>
 
+<sub>Interface overview is a schematic preview based on the current UI structure, not a screenshot. No real business materials are shown.</sub>
+
+**Engineering:** append-only writes · digit-level planning · independent pixel audit
+
+## Validation
+
+`47 passed` · independent post-write pixel audit
+
 ## Run locally
 
 - macOS: `./start_mac.command`
@@ -17,3 +25,5 @@ A PDF date-stamping tool focused on safe placement, layout preservation and post
 - Linux: `./start_linux.sh`
 
 <sub>Public portfolio edition. No real client documents, production data or internal materials are included.</sub>
+
+[Technical notes →](docs/technical-notes.md)
