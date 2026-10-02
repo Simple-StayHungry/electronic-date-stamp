@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><link rel="icon" href="data:,"><title>电子落款</title>
+<link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topin"><div class="brand">电子落款</div><div class="top-right"><span class="local">本机处理</span><button id="fontButton" class="text-button" type="button">字体</button></div></div></header>
+<main>
+<section id="welcome" class="welcome">
+  <div id="drop" class="drop" role="button" tabindex="0" aria-label="选择或拖入 PDF 文件">
+    <button class="upload-button" id="chooseFile" type="button">选择 PDF</button>
+    <span>或拖入文件</span>
+  </div>
+</section>
+<section id="loading" class="loading" hidden aria-live="polite"><div class="load-heading"><span id="phase">识别日期</span><span id="percent">0%</span></div><div class="progress"><i id="bar"></i></div><p id="loadName"></p></section>
+<section id="workspace" class="workspace" hidden>
+  <div class="documentbar"><div class="document-name"><h1 id="filename"></h1><p id="summary"></p></div><button class="text-button" id="replaceFile" type="button">更换文件</button><label class="date-control"><span>默认日期</span><input id="stampDate" type="date" required></label></div>
+  <div class="workgrid">
+    <aside class="page-rail"><div class="railhead"><span>页面</span><select id="pageFilter" aria-label="筛选页面"><option value="all">全部</option><option value="attention">需检查</option></select></div><nav id="pageList" aria-label="物理页码"></nav></aside>
+    <section class="paper-panel">
+      <div class="paper-tools"><span id="pageTitle">第 1 页</span><span id="manualHint" hidden></span><div class="paper-actions"><button id="cancelManual" class="text-button" hidden type="button">取消</button><button id="saveManual" class="small-button" hidden type="button">保存定位</button><select id="zoom" aria-label="预览缩放"><option value="1">适合窗口</option><option value="1.5">150%</option><option value="2">200%</option><option value="3">300%</option></select></div></div>
+      <div id="paperScroll" class="paper-scroll"><div id="paper" class="paper"><img id="pageImage" alt="原 PDF 页面" draggable="false"><svg id="overlay" aria-label="日期栏及手动定位区域" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
+    </section>
+    <aside class="inspector">
+      <div class="inspector-heading"><h2>落款</h2><span id="rowStatus" class="status"></span></div>
+      <select id="rowSelect" aria-label="选择本页的日期栏" hidden></select>
+      <div id="noRow" hidden><p class="hint">未找到日期栏</p><button id="addManual" class="secondary full-width" type="button">框选年月日</button></div>
+      <div id="rowPanel">
+        <div id="fields" class="fields"></div>
+        <div id="rowReasons" class="notice" hidden></div>
+        <div class="row-actions"><button id="confirmRow" class="primary" type="button">确认本栏</button><button id="skipRow" class="secondary" type="button">不处理</button></div>
+        <div id="rowLinks" class="row-links"><button id="relocate" class="text-button" type="button">重新定位</button><button id="autoRow" class="text-button" type="button">恢复自动</button></div>
+        <div id="pageDateControl" class="page-date-control" hidden>
+          <div class="page-date-copy"><span>本页日期</span><small id="pageDateMode">跟随默认</small></div>
+          <input id="pageDate" type="date" aria-label="本页特殊日期">
+          <button id="resetPageDate" class="text-button" type="button" hidden>使用默认</button>
+        </div>
+        <section id="comparison" class="comparison"><div class="comparison-heading"><span>实际排版</span><button id="enlargePreview" class="text-button" type="button">放大</button></div><div class="crop"><span>原件</span><img id="before" alt="原日期栏"></div><div class="crop"><span id="afterLabel">写入后</span><img id="after" alt="按当前计划渲染的日期栏"></div><p id="previewNote" class="subtle"></p></section>
+        <details id="detailsPanel" class="details"><summary>位置与依据</summary><div id="evidence" class="evidence"></div><div class="adjust"><label>字号 <input id="sizeAdjust" type="number" step="0.1" min="4" max="32" placeholder="自动"></label><label>水平偏移 <input id="dxAdjust" type="number" step="0.2" min="-12" max="12" value="0"></label><label>垂直偏移 <input id="dyAdjust" type="number" step="0.2" min="-12" max="12" value="0"></label><button id="applyAdjust" class="secondary" type="button">更新预览</button></div></details>
+      </div>
+    </aside>
+  </div>
+  <footer class="actionbar"><div class="action-info"><span id="actionSummary"></span><span id="auditSummary" class="subtle"></span></div><div class="action-buttons"><button id="reportDownload" class="text-button" type="button" hidden>校验记录</button><button id="generate" class="primary" type="button">生成 PDF</button><button id="download" class="dark" type="button" hidden>下载 PDF</button></div></footer>
+</section>
+</main>
+<input id="fileInput" type="file" accept="application/pdf,.pdf" hidden>
+<input id="fontInput" type="file" accept=".ttf,.otf" hidden>
+<div id="toast" class="toast" role="alert" hidden></div>
+<dialog id="fontDialog"><div class="dialog-head"><h2>字体</h2><button class="text-button close-dialog" type="button">关闭</button></div><p>Times New Roman Regular</p><p id="fontSource" class="hint">上传后检查本机及原 PDF 内嵌字体。</p><p class="subtle">不加粗，不使用近似字体替代。字体文件只在本机使用。</p><button id="chooseFont" class="primary" type="button">选择本机字体</button></dialog>
+<dialog id="partialDialog"><h2>仍有日期栏待确认</h2><p id="partialText"></p><div class="dialog-actions"><button class="secondary close-dialog" type="button">返回检查</button><button id="buildPartial" class="primary" type="button">仅导出已确认部分</button></div></dialog>
+<dialog id="previewDialog" class="preview-dialog"><div class="dialog-head"><h2 id="previewTitle">日期栏</h2><button class="text-button close-dialog" type="button">关闭</button></div><span class="subtle">原件</span><img id="largeBefore" alt="原日期栏放大"><span class="subtle">当前计划</span><img id="largeAfter" alt="当前计划放大"></dialog>
+</body></html>
